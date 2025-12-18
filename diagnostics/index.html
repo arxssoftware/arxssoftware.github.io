@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Diagnostics</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .diagnostic-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .diagnostic-item:last-child {
+            border-bottom: none;
+        }
+        .diagnostic-label {
+            font-weight: 600;
+            color: #555;
+            min-width: 200px;
+        }
+        .diagnostic-value {
+            text-align: right;
+            word-break: break-word;
+            max-width: 60%;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 14px;
+        }
+        .supported {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .not-supported {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .user-agent {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .copy-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+        .test-input {
+            margin: 10px 0;
+        }
+        .test-input input {
+            padding: 10px;
+            font-size: 16px;
+        }
+        #copyStatus {
+            margin-left: 10px;
+            color: #27ae60;
+            font-size: 14px;
+        }
+        .timestamp {
+            color: #7f8c8d;
+            font-size: 12px;
+            text-align: right;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Device Diagnostics</h1>
+    <p>This page helps diagnose device capabilities and browser features for troubleshooting.</p>
+
+    <h2>User Agent</h2>
+    <div class="card">
+        <div class="user-agent" id="userAgent"></div>
+        <button class="copy-btn" onclick="copyDiagnostics()">Copy All Diagnostics</button>
+        <span id="copyStatus"></span>
+    </div>
+
+    <h2>Browser &amp; Platform</h2>
+    <div class="card">
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Platform</span>
+            <span class="diagnostic-value" id="platform"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Language</span>
+            <span class="diagnostic-value" id="language"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Cookies Enabled</span>
+            <span class="diagnostic-value" id="cookiesEnabled"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Online Status</span>
+            <span class="diagnostic-value" id="onlineStatus"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Do Not Track</span>
+            <span class="diagnostic-value" id="doNotTrack"></span>
+        </div>
+    </div>
+
+    <h2>Touch &amp; Input</h2>
+    <div class="card">
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Max Touch Points</span>
+            <span class="diagnostic-value" id="maxTouchPoints"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Touch Events Supported</span>
+            <span class="diagnostic-value" id="touchEvents"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Pointer Events Supported</span>
+            <span class="diagnostic-value" id="pointerEvents"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Input Capture Attribute</span>
+            <span class="diagnostic-value" id="inputCapture"></span>
+        </div>
+    </div>
+
+    <h2>Input Capture Test</h2>
+    <div class="card">
+        <p>Test the <code>capture</code> attribute on file inputs (for camera/microphone access on mobile):</p>
+        <div class="test-input">
+            <label>Image capture (camera): </label><br>
+            <input type="file" accept="image/*" capture="environment">
+        </div>
+        <div class="test-input">
+            <label>Video capture (camera): </label><br>
+            <input type="file" accept="video/*" capture="environment">
+        </div>
+        <div class="test-input">
+            <label>Audio capture (microphone): </label><br>
+            <input type="file" accept="audio/*" capture>
+        </div>
+    </div>
+
+    <h2>Screen &amp; Display</h2>
+    <div class="card">
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Screen Resolution</span>
+            <span class="diagnostic-value" id="screenResolution"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Viewport Size</span>
+            <span class="diagnostic-value" id="viewportSize"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Device Pixel Ratio</span>
+            <span class="diagnostic-value" id="devicePixelRatio"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Color Depth</span>
+            <span class="diagnostic-value" id="colorDepth"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Orientation</span>
+            <span class="diagnostic-value" id="orientation"></span>
+        </div>
+    </div>
+
+    <h2>Media Capabilities</h2>
+    <div class="card">
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">MediaDevices API</span>
+            <span class="diagnostic-value" id="mediaDevices"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">getUserMedia</span>
+            <span class="diagnostic-value" id="getUserMedia"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">WebRTC</span>
+            <span class="diagnostic-value" id="webrtc"></span>
+        </div>
+    </div>
+
+    <h2>Hardware</h2>
+    <div class="card">
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Logical Processors</span>
+            <span class="diagnostic-value" id="hardwareConcurrency"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Device Memory</span>
+            <span class="diagnostic-value" id="deviceMemory"></span>
+        </div>
+        <div class="diagnostic-item">
+            <span class="diagnostic-label">Connection Type</span>
+            <span class="diagnostic-value" id="connectionType"></span>
+        </div>
+    </div>
+
+    <div class="timestamp">
+        Diagnostics generated: <span id="timestamp"></span>
+    </div>
+
+    <script>
+        const diagnostics = {};
+
+        function detect() {
+            // User Agent
+            diagnostics.userAgent = navigator.userAgent;
+            document.getElementById('userAgent').textContent = diagnostics.userAgent;
+
+            // Browser & Platform
+            diagnostics.platform = navigator.platform || navigator.userAgentData?.platform || 'N/A';
+            document.getElementById('platform').textContent = diagnostics.platform;
+
+            diagnostics.language = navigator.language;
+            document.getElementById('language').textContent = diagnostics.language;
+
+            diagnostics.cookiesEnabled = navigator.cookieEnabled;
+            document.getElementById('cookiesEnabled').innerHTML = formatBoolean(navigator.cookieEnabled);
+
+            diagnostics.onlineStatus = navigator.onLine;
+            document.getElementById('onlineStatus').innerHTML = navigator.onLine ?
+                '<span class="supported">Online</span>' : '<span class="not-supported">Offline</span>';
+
+            diagnostics.doNotTrack = navigator.doNotTrack;
+            document.getElementById('doNotTrack').textContent = navigator.doNotTrack || 'Not set';
+
+            // Touch & Input
+            diagnostics.maxTouchPoints = navigator.maxTouchPoints;
+            document.getElementById('maxTouchPoints').textContent = navigator.maxTouchPoints;
+
+            diagnostics.touchEventsSupported = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            document.getElementById('touchEvents').innerHTML = formatBoolean(diagnostics.touchEventsSupported);
+
+            diagnostics.pointerEventsSupported = 'PointerEvent' in window;
+            document.getElementById('pointerEvents').innerHTML = formatBoolean(diagnostics.pointerEventsSupported);
+
+            // Input capture attribute detection
+            const inputElement = document.createElement('input');
+            diagnostics.inputCaptureSupported = 'capture' in inputElement;
+            document.getElementById('inputCapture').innerHTML = formatBoolean(diagnostics.inputCaptureSupported);
+
+            // Screen & Display
+            diagnostics.screenResolution = `${screen.width} x ${screen.height}`;
+            document.getElementById('screenResolution').textContent = diagnostics.screenResolution;
+
+            diagnostics.viewportSize = `${window.innerWidth} x ${window.innerHeight}`;
+            document.getElementById('viewportSize').textContent = diagnostics.viewportSize;
+
+            diagnostics.devicePixelRatio = window.devicePixelRatio;
+            document.getElementById('devicePixelRatio').textContent = window.devicePixelRatio;
+
+            diagnostics.colorDepth = screen.colorDepth + '-bit';
+            document.getElementById('colorDepth').textContent = diagnostics.colorDepth;
+
+            diagnostics.orientation = screen.orientation?.type || 'N/A';
+            document.getElementById('orientation').textContent = diagnostics.orientation;
+
+            // Media Capabilities
+            diagnostics.mediaDevicesSupported = 'mediaDevices' in navigator;
+            document.getElementById('mediaDevices').innerHTML = formatBoolean(diagnostics.mediaDevicesSupported);
+
+            diagnostics.getUserMediaSupported = !!(navigator.mediaDevices?.getUserMedia || navigator.getUserMedia);
+            document.getElementById('getUserMedia').innerHTML = formatBoolean(diagnostics.getUserMediaSupported);
+
+            diagnostics.webrtcSupported = 'RTCPeerConnection' in window;
+            document.getElementById('webrtc').innerHTML = formatBoolean(diagnostics.webrtcSupported);
+
+            // Hardware
+            diagnostics.hardwareConcurrency = navigator.hardwareConcurrency || 'N/A';
+            document.getElementById('hardwareConcurrency').textContent = diagnostics.hardwareConcurrency;
+
+            diagnostics.deviceMemory = navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'N/A';
+            document.getElementById('deviceMemory').textContent = diagnostics.deviceMemory;
+
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            diagnostics.connectionType = connection?.effectiveType || 'N/A';
+            document.getElementById('connectionType').textContent = diagnostics.connectionType;
+
+            // Timestamp
+            diagnostics.timestamp = new Date().toISOString();
+            document.getElementById('timestamp').textContent = diagnostics.timestamp;
+        }
+
+        function formatBoolean(value) {
+            return value ?
+                '<span class="supported">Supported</span>' :
+                '<span class="not-supported">Not Supported</span>';
+        }
+
+        function copyDiagnostics() {
+            const text = Object.entries(diagnostics)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join('\n');
+
+            navigator.clipboard.writeText(text).then(() => {
+                const status = document.getElementById('copyStatus');
+                status.textContent = 'Copied!';
+                setTimeout(() => status.textContent = '', 2000);
+            }).catch(err => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                const status = document.getElementById('copyStatus');
+                status.textContent = 'Copied!';
+                setTimeout(() => status.textContent = '', 2000);
+            });
+        }
+
+        // Run detection on load
+        detect();
+
+        // Update viewport size on resize
+        window.addEventListener('resize', () => {
+            diagnostics.viewportSize = `${window.innerWidth} x ${window.innerHeight}`;
+            document.getElementById('viewportSize').textContent = diagnostics.viewportSize;
+        });
+
+        // Update orientation on change
+        screen.orientation?.addEventListener('change', () => {
+            diagnostics.orientation = screen.orientation.type;
+            document.getElementById('orientation').textContent = diagnostics.orientation;
+        });
+    </script>
+</body>
+</html>
